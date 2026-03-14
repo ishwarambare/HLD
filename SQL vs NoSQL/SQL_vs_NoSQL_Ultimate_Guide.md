@@ -693,7 +693,7 @@ graph LR
 
 ### NoSQL Types Comparison
 
-| Factor | Document | Key-Value | Wide-Column | Graph |
+`| Factor | Document | Key-Value | Wide-Column | Graph |
 | :--- | :--- | :--- | :--- | :--- |
 | **Complexity** | Medium | Simple | Medium | Complex |
 | **Query Power** | Rich | Minimal | Moderate | Very Rich |
@@ -701,7 +701,7 @@ graph LR
 | **Write Speed** | Fast | Fastest | Fastest | Moderate |
 | **Scalability** | High | Very High | Very High | Moderate |
 | **Flexibility** | Very High | Low | High | High |
-
+`
 ---
 
 ## Query Language & Flexibility

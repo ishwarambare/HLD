@@ -187,6 +187,14 @@ Before jumping into the design, it is critical to understand **how HLD interview
 
 ---
 
+### 🎬 Visual Overview — Typeahead System Design Complete Reference
+
+![Typeahead System Design — Complete Visual Reference](images/typeahead_diagram.png)
+
+> *The diagram above shows the complete typeahead system design reference — covering MVP requirements, scale estimation, system architecture (read & write paths), the two-hashmap data model, write optimizations (sampling, batching, time decay), and the full interview framework — all on a single poster.*
+
+---
+
 # PART 2: REQUIREMENTS GATHERING (MVP)
 
 ---

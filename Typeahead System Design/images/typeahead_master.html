@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #060d1a;
+            color: #e2e8f0;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            width: 1700px;
+        }
+
+        /* ── HEADER ── */
+        .hdr {
+            background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 100%);
+            border-bottom: 2px solid #1a3360;
+            padding: 20px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .hdr h1 {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hdr .sub { font-size: 11px; color: #475569; margin-top: 4px; }
+        .pill {
+            display: inline-block;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            margin: 2px;
+        }
+
+        /* ── GRID ── */
+        .grid {
+            display: grid;
+            grid-template-columns: 480px 1fr 420px;
+            gap: 18px;
+            padding: 18px 22px 0;
+        }
+
+        /* ── CARD ── */
+        .card {
+            background: #0b1525;
+            border: 1px solid #1a3360;
+            border-radius: 18px;
+            padding: 22px;
+        }
+        .card-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #1a3360;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ═══════ LEFT — WHAT IS TYPEAHEAD ═══════ */
+        .search-demo {
+            background: #080f1e;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+        .search-bar {
+            background: #0f172a;
+            border: 2px solid #1e3a6e;
+            border-radius: 30px;
+            padding: 12px 20px 12px 44px;
+            font-size: 18px;
+            color: #e2e8f0;
+            position: relative;
+            margin-bottom: 4px;
+        }
+        .search-bar::before {
+            content: '🔍';
+            position: absolute;
+            left: 14px;
+            font-size: 16px;
+        }
+        .search-typed { color: #38bdf8; font-weight: 700; }
+        .suggest-list {
+            background: #0f172a;
+            border: 1px solid #1e3a6e;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+        }
+        .sug-item {
+            padding: 10px 20px 10px 44px;
+            font-size: 14px;
+            color: #94a3b8;
+            border-bottom: 1px solid #0d1a30;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sug-item:last-child { border-bottom: none; }
+        .sug-item .pre { color: #38bdf8; font-weight: 700; }
+        .sug-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .badge-blue { background: rgba(56,189,248,0.15); color: #38bdf8; }
+        .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
+        .badge-amber { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .badge-purple { background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+        /* MVP table */
+        .mvp-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; }
+        .mvp-table th {
+            background: #050c1a;
+            color: #475569;
+            padding: 6px 8px;
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 800;
+            text-align: left;
+        }
+        .mvp-table td {
+            padding: 7px 8px;
+            border-bottom: 1px solid #0d1a30;
+            color: #94a3b8;
+        }
+        .mvp-table tr:last-child td { border: none; }
+        .yes { color: #34d399; font-weight: 800; }
+        .no { color: #f87171; font-weight: 800; }
+        .mvp-table td:first-child { color: #e2e8f0; }
+
+        /* Scale box */
+        .scale-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .scale-box {
+            background: #060d1a;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #1a3360;
+        }
+        .scale-num {
+            font-size: 22px;
+            font-weight: 900;
+            color: #38bdf8;
+            display: block;
+        }
+        .scale-lbl {
+            font-size: 9px;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* ═══════ MIDDLE — SYSTEM ARCHITECTURE ═══════ */
+        .arch-wrap {
+            position: relative;
+            height: 520px;
+            background: #060d1a;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .arch-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        /* Architecture nodes */
+        .anode {
+            position: absolute;
+            background: #0b1525;
+            border: 2px solid #1a3360;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 11px;
+            z-index: 10;
+        }
+        .anode .atitle {
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .anode .asub {
+            font-size: 10px;
+            color: #475569;
+        }
+        .an-client { border-color: #f59e0b; }
+        .an-client .atitle { color: #fbbf24; }
+        .an-gateway { border-color: #94a3b8; }
+        .an-gateway .atitle { color: #cbd5e1; }
+        .an-read { border-color: #38bdf8; background: rgba(56,189,248,0.05); }
+        .an-read .atitle { color: #38bdf8; }
+        .an-write { border-color: #10b981; background: rgba(16,185,129,0.05); }
+        .an-write .atitle { color: #10b981; }
+        .an-redis { border-color: #f43f5e; background: rgba(244,63,94,0.05); }
+        .an-redis .atitle { color: #fb7185; }
+        .an-kafka { border-color: #f59e0b; background: rgba(245,158,11,0.05); }
+        .an-kafka .atitle { color: #fbbf24; }
+        .an-consumer { border-color: #a78bfa; background: rgba(167,139,250,0.05); }
+        .an-consumer .atitle { color: #a78bfa; }
+        .an-prefix { border-color: #38bdf8; }
+        .an-prefix .atitle { color: #38bdf8; }
+        .an-hitcount { border-color: #34d399; }
+        .an-hitcount .atitle { color: #34d399; }
+
+        /* Moving dots animation */
+        @keyframes moveDotRead {
+            0%   { offset-distance: 0%; opacity: 1; }
+            90%  { opacity: 1; }
+            100% { offset-distance: 100%; opacity: 0; }
+        }
+        @keyframes moveDotWrite {
+            0%   { offset-distance: 0%; opacity: 1; }
+            90%  { opacity: 1; }
+            100% { offset-distance: 100%; opacity: 0; }
+        }
+        .moving-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: moveDotRead 2s linear infinite;
+        }
+
+        /* ═══════ DATA STRUCTURES ═══════ */
+        .ds-section { margin-bottom: 14px; }
+        .ds-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .kv-wrap {
+            background: #060d1a;
+            border-radius: 10px;
+            border: 1px solid #1a3360;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .kv-header {
+            background: #080f1e;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #1a3360;
+        }
+        .kv-header-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #60a5fa;
+        }
+        .kv-tag {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(96,165,250,0.1);
+            color: #93c5fd;
+        }
+        .kv-row {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border-bottom: 1px solid #060d1a;
+            font-size: 11px;
+        }
+        .kv-row:last-child { border-bottom: none; }
+        .kv-key {
+            width: 95px;
+            padding: 7px 10px;
+            font-family: monospace;
+            color: #fbbf24;
+            font-weight: 700;
+            border-right: 1px solid #1a3360;
+            flex-shrink: 0;
+        }
+        .kv-val {
+            padding: 7px 10px;
+            color: #94a3b8;
+            flex: 1;
+        }
+        .kv-active .kv-key { color: #34d399; }
+        .kv-active .kv-val { color: #e2e8f0; background: rgba(52,211,153,0.05); }
+
+        /* Trie visualization */
+        .trie-svg-wrap {
+            background: #060d1a;
+            border-radius: 10px;
+            border: 1px solid #1a3360;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* ═══════ RIGHT — OPTIMIZATIONS ═══════ */
+        .opt-section { margin-bottom: 16px; }
+        .opt-title {
+            font-size: 12px;
+            font-weight: 900;
+            color: #818cf8;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .num-badge {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(129,140,248,0.15);
+            border: 1px solid #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 900;
+            color: #818cf8;
+            flex-shrink: 0;
+        }
+        .opt-box {
+            background: #060d1a;
+            border-radius: 10px;
+            border: 1px solid #1a3360;
+            padding: 12px;
+        }
+        .opt-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+        .opt-row .arrow { color: #38bdf8; font-weight: 700; flex-shrink: 0; }
+        .opt-row:last-child { margin-bottom: 0; }
+
+        .math-box {
+            background: rgba(56,189,248,0.06);
+            border: 1px solid #1e3a6e;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-family: monospace;
+            color: #38bdf8;
+            margin-top: 6px;
+            line-height: 1.7;
+        }
+
+        /* Time decay visual */
+        .decay-grid {
+            display: grid;
+            grid-template-columns: 1fr 24px 1fr;
+            gap: 6px;
+            align-items: center;
+            font-size: 10px;
+            margin-top: 6px;
+        }
+        .decay-before {
+            background: rgba(249,115,22,0.1);
+            border: 1px solid rgba(249,115,22,0.3);
+            border-radius: 8px;
+            padding: 6px 8px;
+            color: #fb923c;
+        }
+        .decay-after {
+            background: rgba(52,211,153,0.1);
+            border: 1px solid rgba(52,211,153,0.3);
+            border-radius: 8px;
+            padding: 6px 8px;
+            color: #34d399;
+        }
+        .decay-arrow { text-align: center; color: #475569; font-size: 16px; }
+
+        /* ═══════ BOTTOM ROW ═══════ */
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            margin: 16px 22px 16px;
+        }
+        .bot-card {
+            background: #0b1525;
+            border: 1px solid #1a3360;
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .bot-title {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid #1a3360;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .bot-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-size: 10px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        .tick-green { color: #34d399; flex-shrink: 0; font-weight: 700; }
+        .tick-red { color: #f87171; flex-shrink: 0; font-weight: 700; }
+        .tick-blue { color: #60a5fa; flex-shrink: 0; font-weight: 700; }
+
+        /* QPS gauge */
+        .qps-compare {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .qps-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
+        .qps-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+        }
+        .qps-label .lname { color: #94a3b8; font-weight: 600; }
+        .qps-label .lval { font-weight: 800; }
+        .qps-track {
+            height: 12px;
+            background: #060d1a;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .qps-fill {
+            height: 100%;
+            border-radius: 6px;
+            animation: fillBar 2s ease-out forwards;
+        }
+        @keyframes fillBar {
+            from { width: 0; }
+        }
+
+        /* Decision flow */
+        .flow-box {
+            background: #060d1a;
+            border-radius: 8px;
+            border: 1px solid #1a3360;
+            padding: 8px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .flow-arr { text-align: center; color: #475569; font-size: 10px; margin-bottom: 6px; }
+        .flow-yes { border-color: #047857; color: #34d399; background: rgba(16,185,129,0.05); }
+        .flow-no { border-color: #1d4ed8; color: #60a5fa; background: rgba(59,130,246,0.05); }
+        .flow-q { border-color: #b45309; color: #fbbf24; background: rgba(245,158,11,0.05); }
+
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<div class="hdr">
+    <div>
+        <h1>Typeahead System Design — Complete Visual Reference</h1>
+        <div class="sub">HLD Case Study 2 | Google Scale | Prefix Search | Eventual Consistency</div>
+    </div>
+    <div>
+        <span class="pill">Read: 1M+ QPS</span>
+        <span class="pill">Write: 100K QPS</span>
+        <span class="pill">Latency: &lt; 10ms</span>
+        <span class="pill">Data: ~1 PB / 10 yrs</span>
+        <span class="pill">AP System</span>
+    </div>
+</div>
+
+<!-- ══════════════════ MAIN 3-COL GRID ══════════════════ -->
+<div class="grid">
+
+    <!-- ═══════ LEFT COL ═══════ -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- What is Typeahead -->
+        <div class="card">
+            <div class="card-title">🔍 What is Typeahead?</div>
+
+            <div class="search-demo">
+                <div style="position:relative;">
+                    <div class="search-bar">
+                        <span class="search-typed">diw</span><span style="border-left:2px solid #38bdf8;height:18px;display:inline-block;vertical-align:middle;margin-left:1px;animation:blink 1s step-end infinite;"></span>
+                    </div>
+                    <div class="suggest-list">
+                        <div class="sug-item"><span><span class="pre">diw</span>ali</span><span class="sug-badge badge-blue">1.4B hits</span></div>
+                        <div class="sug-item"><span><span class="pre">diw</span>ali 2024 date</span><span class="sug-badge badge-green">🔥 Trending</span></div>
+                        <div class="sug-item"><span><span class="pre">diw</span>ali rangoli</span><span class="sug-badge badge-amber">Images</span></div>
+                        <div class="sug-item"><span><span class="pre">diw</span>ali wishes</span></div>
+                        <div class="sug-item"><span><span class="pre">diw</span>ali crackers</span><span class="sug-badge badge-purple">News</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="font-size:10px;color:#475569;line-height:1.7;margin-bottom:10px;">
+                Typeahead (autocomplete) predicts what you will search based on a <strong style="color:#38bdf8;">strict prefix match</strong>. Activates after 3 chars. Returns top 5 by popularity. No personalization in MVP.
+            </div>
+
+            <!-- MVP table -->
+            <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">MVP Features</div>
+            <table class="mvp-table">
+                <tr><th>Feature</th><th>In MVP?</th></tr>
+                <tr><td>Top 5 suggestions</td><td class="yes">✅ YES</td></tr>
+                <tr><td>Min 3 chars trigger</td><td class="yes">✅ YES</td></tr>
+                <tr><td>Global popularity ranking</td><td class="yes">✅ YES</td></tr>
+                <tr><td>Unicode support</td><td class="yes">✅ YES</td></tr>
+                <tr><td>User personalization</td><td class="no">❌ NO</td></tr>
+                <tr><td>Fuzzy / spell correction</td><td class="no">❌ NO</td></tr>
+            </table>
+        </div>
+
+        <!-- Scale Estimation -->
+        <div class="card">
+            <div class="card-title">📊 Scale Estimation</div>
+            <div class="scale-grid">
+                <div class="scale-box">
+                    <span class="scale-num">10B</span>
+                    <div class="scale-lbl">Searches / Day</div>
+                </div>
+                <div class="scale-box">
+                    <span class="scale-num" style="color:#34d399;">1M+</span>
+                    <div class="scale-lbl">Typeahead QPS (peak)</div>
+                </div>
+                <div class="scale-box">
+                    <span class="scale-num" style="color:#fbbf24;">100K</span>
+                    <div class="scale-lbl">Write QPS (search events)</div>
+                </div>
+                <div class="scale-box">
+                    <span class="scale-num" style="color:#a78bfa;">~1 PB</span>
+                    <div class="scale-lbl">Storage (10 years)</div>
+                </div>
+            </div>
+
+            <div class="math-box">
+10B searches/day ÷ 86,400s = <strong>~100K writes/sec</strong>
+10 chars/query − 3 min = 7 typeahead calls
+100K × 10 = <strong>1M reads/sec</strong> (peak)
+100 bytes/query × 1.5B unique/day × 365 × 10
+= <strong>~1,000 TB (1 Petabyte)</strong>
+            </div>
+
+            <div style="margin-top:10px;padding:8px 12px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25);border-radius:8px;font-size:10px;color:#fca5a5;font-weight:700;text-align:center;">
+                ⚠️ Sharding is REQUIRED — both for storage size and request volume
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══════ CENTER COL — ARCHITECTURE ═══════ -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card" style="flex:0;">
+            <div class="card-title">🏗️ System Architecture — Read &amp; Write Paths</div>
+
+            <!-- Architecture diagram using pure CSS/HTML -->
+            <div style="position:relative;background:#060d1a;border-radius:12px;padding:16px;overflow:visible;">
+
+                <!-- READ PATH label -->
+                <div style="font-size:9px;font-weight:900;color:#38bdf8;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">
+                    🔵 READ PATH (per keystroke)
+                </div>
+
+                <!-- Read path row -->
+                <div style="display:flex;align-items:center;gap:0;margin-bottom:6px;">
+                    <div class="anode an-client" style="width:110px;flex-shrink:0;">
+                        <div class="atitle">Browser</div>
+                        <div class="asub">Types "diw"</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:linear-gradient(90deg,#38bdf8,#38bdf8);position:relative;">
+                        <div style="position:absolute;right:0;top:-4px;color:#38bdf8;font-size:10px;">▶</div>
+                        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:#38bdf8;font-weight:700;white-space:nowrap;">GET /typeahead?prefix=diw</div>
+                    </div>
+                    <div class="anode an-read" style="width:130px;flex-shrink:0;text-align:center;">
+                        <div class="atitle">Typeahead API</div>
+                        <div class="asub">Stateless</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:#38bdf8;position:relative;">
+                        <div style="position:absolute;right:0;top:-4px;color:#38bdf8;font-size:10px;">▶</div>
+                        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:#38bdf8;font-weight:700;white-space:nowrap;">Check cache first</div>
+                    </div>
+                    <div class="anode an-redis" style="width:120px;flex-shrink:0;text-align:center;">
+                        <div class="atitle">Redis</div>
+                        <div class="asub">Cache &lt;1ms</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:#38bdf8;position:relative;border-style:dashed;">
+                        <div style="position:absolute;right:0;top:-4px;color:#38bdf8;font-size:10px;">▶</div>
+                        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:#8b5cf6;font-weight:700;white-space:nowrap;">Cache miss only</div>
+                    </div>
+                    <div class="anode an-prefix" style="width:130px;flex-shrink:0;text-align:center;">
+                        <div class="atitle">Prefix Store</div>
+                        <div class="asub">KV · Sharded</div>
+                    </div>
+                </div>
+
+                <div style="margin:14px 0;height:1px;background:linear-gradient(90deg,transparent,#1a3360,transparent);"></div>
+
+                <!-- WRITE PATH label -->
+                <div style="font-size:9px;font-weight:900;color:#10b981;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">
+                    🟢 WRITE PATH (on search submit)
+                </div>
+
+                <!-- Write path row -->
+                <div style="display:flex;align-items:center;gap:0;margin-bottom:6px;">
+                    <div class="anode an-client" style="width:110px;flex-shrink:0;">
+                        <div class="atitle">Browser</div>
+                        <div class="asub">Hits Enter</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:#10b981;position:relative;">
+                        <div style="position:absolute;right:0;top:-4px;color:#10b981;font-size:10px;">▶</div>
+                        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:#10b981;font-weight:700;white-space:nowrap;">POST /search/event</div>
+                    </div>
+                    <div class="anode an-write" style="width:130px;flex-shrink:0;text-align:center;">
+                        <div class="atitle">Search API</div>
+                        <div class="asub">Fire &amp; Forget</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:#10b981;position:relative;">
+                        <div style="position:absolute;right:0;top:-4px;color:#10b981;font-size:10px;">▶</div>
+                        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:#10b981;font-weight:700;white-space:nowrap;">Publish event</div>
+                    </div>
+                    <div class="anode an-kafka" style="width:120px;flex-shrink:0;text-align:center;">
+                        <div class="atitle">Kafka</div>
+                        <div class="asub">async queue</div>
+                    </div>
+                    <div style="flex:1;height:2px;background:#10b981;position:relative;">
+                        <div style="position:absolute;right:0;top:-4px;color:#10b981;font-size:10px;">▶</div>
+                        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:#10b981;font-weight:700;white-space:nowrap;">Consume</div>
+                    </div>
+                    <div class="anode an-consumer" style="width:130px;flex-shrink:0;text-align:center;">
+                        <div class="atitle">Consumer</div>
+                        <div class="asub">Sampling·Batch</div>
+                    </div>
+                </div>
+
+                <!-- Consumer → stores -->
+                <div style="display:flex;justify-content:flex-end;margin-top:8px;gap:16px;padding-right:0;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0;position:relative;right:0;">
+                        <div style="font-size:9px;color:#a78bfa;margin-bottom:4px;font-weight:700;">Consumer updates:</div>
+                        <div style="display:flex;gap:20px;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                                <div style="width:2px;height:20px;background:#a78bfa;"></div>
+                                <div class="anode an-prefix" style="width:120px;text-align:center;padding:6px 10px;">
+                                    <div class="atitle" style="font-size:10px;">Prefix Store</div>
+                                    <div class="asub">top5 updates</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                                <div style="width:2px;height:20px;background:#a78bfa;"></div>
+                                <div class="anode an-hitcount" style="width:120px;text-align:center;padding:6px 10px;">
+                                    <div class="atitle" style="font-size:10px;">Hit Count Store</div>
+                                    <div class="asub">count++ upsert</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Hashmaps -->
+        <div class="card">
+            <div class="card-title">🗺️ Two-Hashmap Data Model (Key-Value Approach)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                    <div class="kv-wrap">
+                        <div class="kv-header">
+                            <div class="kv-header-title">Prefix Store (H1)</div>
+                            <div class="kv-tag">READ path</div>
+                        </div>
+                        <div class="kv-row"><div class="kv-key">"d"</div><div class="kv-val">["diwali","download"…]</div></div>
+                        <div class="kv-row"><div class="kv-key">"di"</div><div class="kv-val">["disney","diwali"…]</div></div>
+                        <div class="kv-row kv-active"><div class="kv-key">"diw"</div><div class="kv-val">["diwali","diwali 2024","diwali rangoli","diwali wishes","diwali crackers"]</div></div>
+                        <div class="kv-row"><div class="kv-key">"diwa"</div><div class="kv-val">["diwali","diwali 2024"…]</div></div>
+                        <div class="kv-row"><div class="kv-key">"ipl"</div><div class="kv-val">["ipl 2024","ipl schedule"…]</div></div>
+                    </div>
+                    <div style="font-size:10px;color:#475569;line-height:1.5;padding:2px 4px;">
+                        ✅ O(1) lookup<br>✅ No tree traversal<br>✅ Sharded by prefix hash
+                    </div>
+                </div>
+                <div>
+                    <div class="kv-wrap">
+                        <div class="kv-header">
+                            <div class="kv-header-title">Hit Count Store (H2)</div>
+                            <div class="kv-tag" style="color:#6ee7b7;background:rgba(16,185,129,0.1);">WRITE path</div>
+                        </div>
+                        <div class="kv-row"><div class="kv-key">"diwali"</div><div class="kv-val" style="color:#fbbf24;font-weight:700;">10,000,000</div></div>
+                        <div class="kv-row"><div class="kv-key">"diwali 24"</div><div class="kv-val">4,500,000</div></div>
+                        <div class="kv-row"><div class="kv-key">"ipl 2024"</div><div class="kv-val">7,200,000</div></div>
+                        <div class="kv-row"><div class="kv-key">"weather"</div><div class="kv-val">9,800,000</div></div>
+                        <div class="kv-row"><div class="kv-key">"roger fed"</div><div class="kv-val">100,000,000</div></div>
+                    </div>
+                    <div style="font-size:10px;color:#475569;line-height:1.5;padding:2px 4px;">
+                        ✅ Full query → count<br>✅ Upsert on every search<br>✅ Source of truth for ranking
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:10px;padding:8px 12px;background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.2);border-radius:8px;font-size:10px;color:#a5b4fc;line-height:1.6;">
+                💡 <strong>Why no Trie?</strong> Trie is conceptually useful but impractical at scale — no production DB offers native Trie. With hashmaps: reads are O(1), sharding is native, and we decouple read/write concerns completely.
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ RIGHT COL — OPTIMIZATIONS ═══════ -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Design Goals -->
+        <div class="card">
+            <div class="card-title">🎯 Design Goals (PACELC)</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:10px;text-align:center;">
+                    <div style="font-size:18px;font-weight:900;color:#34d399;">AP</div>
+                    <div style="font-size:9px;color:#6ee7b7;font-weight:700;">Available + Partition Tolerant</div>
+                    <div style="font-size:9px;color:#475569;margin-top:4px;">Eventual Consistency is OK</div>
+                </div>
+                <div style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.25);border-radius:10px;padding:10px;text-align:center;">
+                    <div style="font-size:18px;font-weight:900;color:#38bdf8;">&lt;10ms</div>
+                    <div style="font-size:9px;color:#7dd3fc;font-weight:700;">Server-side Latency Target</div>
+                    <div style="font-size:9px;color:#475569;margin-top:4px;">Compete with typing speed</div>
+                </div>
+            </div>
+
+            <div style="font-size:10px;line-height:1.6;color:#94a3b8;">
+                <div style="margin-bottom:4px;">✅ <strong style="color:#e2e8f0;">Availability</strong> wins — system must always respond</div>
+                <div style="margin-bottom:4px;">✅ <strong style="color:#e2e8f0;">Eventual consistency</strong> — stale top-5 is invisible to users</div>
+                <div>✅ <strong style="color:#e2e8f0;">Low latency</strong> wins over strong consistency</div>
+            </div>
+        </div>
+
+        <!-- Optimizations -->
+        <div class="card">
+            <div class="card-title">⚡ Write Optimizations</div>
+
+            <div class="opt-section">
+                <div class="opt-title"><div class="num-badge">1</div>Sampling (Reduce Write Load)</div>
+                <div class="opt-box">
+                    <div class="opt-row"><span class="arrow">→</span><span>Only write to DB on <strong style="color:#38bdf8;">every 1000th</strong> search</span></div>
+                    <div class="opt-row"><span class="arrow">→</span><span>100K writes/sec → <strong style="color:#34d399;">100 writes/sec</strong> (1000x reduction)</span></div>
+                    <div class="opt-row"><span class="arrow">→</span><span>Like exit polls: sample preserves the trend</span></div>
+                    <div class="math-box">if (count % 1000 == 0) → write to DB</div>
+                </div>
+            </div>
+
+            <div class="opt-section">
+                <div class="opt-title"><div class="num-badge">2</div>Batching &amp; Threshold Cache</div>
+                <div class="opt-box">
+                    <div class="opt-row"><span class="arrow">→</span><span>In-memory cache (1 day) absorbs all writes</span></div>
+                    <div class="opt-row"><span class="arrow">→</span><span>Flush to DB only when count hits threshold</span></div>
+                    <div class="opt-row"><span class="arrow">→</span><span>Prefix updates happen only every 1000 searches — not every search</span></div>
+                </div>
+            </div>
+
+            <div class="opt-section">
+                <div class="opt-title"><div class="num-badge">3</div>Time Decay — Recency Factor</div>
+                <div class="opt-box">
+                    <div class="opt-row"><span class="arrow">→</span><span>Daily: reduce all counts by 1% AND subtract fixed amount</span></div>
+                    <div class="decay-grid">
+                        <div class="decay-before">"covid" = 50M<br><span style="font-size:9px;opacity:0.7;">(mostly 2020)</span></div>
+                        <div class="decay-arrow">→</div>
+                        <div class="decay-after">"covid" = 49.5M<br><span style="font-size:9px;opacity:0.7;">−1% each day</span></div>
+                    </div>
+                    <div class="math-box">new_count = (count × 0.99) − 1000
+if new_count &lt; 100 → DELETE entry ✅</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APIs -->
+        <div class="card">
+            <div class="card-title">🔌 API Design</div>
+            <div style="background:#060d1a;border-radius:8px;border:1px solid #1a3360;padding:10px;font-family:monospace;font-size:10px;color:#94a3b8;line-height:1.7;margin-bottom:8px;">
+                <span style="color:#60a5fa;font-weight:800;">GET</span> /typeahead/suggestions<br>
+                &nbsp;&nbsp;?prefix=<span style="color:#34d399;">"diw"</span><br>
+                &nbsp;&nbsp;&amp;region=<span style="color:#34d399;">"IN"</span><br>
+                &nbsp;&nbsp;&amp;limit=<span style="color:#fbbf24;">5</span><br>
+                → Returns: [<span style="color:#34d399;">"diwali"</span>, ...]
+            </div>
+            <div style="background:#060d1a;border-radius:8px;border:1px solid #1a3360;padding:10px;font-family:monospace;font-size:10px;color:#94a3b8;line-height:1.7;">
+                <span style="color:#10b981;font-weight:800;">POST</span> /search/event<br>
+                &nbsp;&nbsp;{query: <span style="color:#34d399;">"diwali rangoli"</span>,<br>
+                &nbsp;&nbsp;&nbsp;region: <span style="color:#34d399;">"IN"</span>}<br>
+                → <span style="color:#fbbf24;">202 Accepted</span> (async!)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════ BOTTOM ROW ══════════════════ -->
+<div class="bottom-row">
+
+    <!-- Sharding -->
+    <div class="bot-card">
+        <div class="bot-title" style="color:#60a5fa;">🔀 Sharding Strategy</div>
+        <div class="bot-row"><span class="tick-blue">→</span>Shard by prefix: "d"→"f" on Shard 1</div>
+        <div class="bot-row"><span class="tick-green">✅</span>All prefixes of one query → same shard</div>
+        <div class="bot-row"><span class="tick-green">✅</span>Intra-shard reads = no cross-shard coordination</div>
+        <div class="bot-row"><span class="tick-green">✅</span>KV store auto-shards by key hash</div>
+        <div style="margin-top:8px;font-size:9px;color:#1e3a6e;background:#0b1525;border-radius:6px;padding:6px 8px;font-family:monospace;color:#64748b;">
+            Shard 1: a→f<br>Shard 2: g→m<br>Shard 3: n→t<br>Shard 4: u→z
+        </div>
+    </div>
+
+    <!-- Caching -->
+    <div class="bot-card">
+        <div class="bot-title" style="color:#fb7185;">🗃️ Caching Layer (Redis)</div>
+        <div class="qps-compare">
+            <div class="qps-bar-wrap">
+                <div class="qps-label">
+                    <span class="lname">Cache Hit (&lt;1ms)</span>
+                    <span class="lval" style="color:#34d399;">~95% of requests</span>
+                </div>
+                <div class="qps-track"><div class="qps-fill" style="width:95%;background:#34d399;"></div></div>
+            </div>
+            <div class="qps-bar-wrap">
+                <div class="qps-label">
+                    <span class="lname">Cache Miss (3-5ms)</span>
+                    <span class="lval" style="color:#f87171;">~5% of requests</span>
+                </div>
+                <div class="qps-track"><div class="qps-fill" style="width:5%;background:#f87171;"></div></div>
+            </div>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:#94a3b8;line-height:1.5;">
+            Popular prefixes like "wea", "ipl", "diw" are searched millions of times/min → extremely hot cache with 95%+ hit rate.
+        </div>
+    </div>
+
+    <!-- Client Optimizations -->
+    <div class="bot-card">
+        <div class="bot-title" style="color:#34d399;">🖥️ Client-Side Optimizations</div>
+        <div class="bot-row"><span class="tick-green">✅</span><span><strong style="color:#e2e8f0;">Debouncing</strong> — wait 200ms after last keypress before firing API. Saves 70-80% of requests.</span></div>
+        <div class="bot-row"><span class="tick-green">✅</span><span><strong style="color:#e2e8f0;">Min 3 chars</strong> — don't fire for "d" or "di". Too broad, too noisy.</span></div>
+        <div class="bot-row"><span class="tick-green">✅</span><span><strong style="color:#e2e8f0;">Local cache</strong> — cache last few prefix results in browser memory.</span></div>
+        <div style="margin-top:8px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:6px;padding:6px 8px;font-size:9px;color:#6ee7b7;font-weight:700;text-align:center;">
+            Combined: 85–90% fewer API calls from client
+        </div>
+    </div>
+
+    <!-- Interview Flow -->
+    <div class="bot-card">
+        <div class="bot-title" style="color:#fbbf24;">🎤 Interview Framework</div>
+        <div class="flow-box flow-q">1. Clarify Problem Statement</div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box" style="border-color:#475569;color:#94a3b8;background:rgba(255,255,255,0.02);">2. Define MVP (product only)</div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box" style="border-color:#475569;color:#94a3b8;background:rgba(255,255,255,0.02);">3. Scale Estimation (storage + QPS)</div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box" style="border-color:#475569;color:#94a3b8;background:rgba(255,255,255,0.02);">4. Design Goals (CAP / PACELC)</div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box" style="border-color:#475569;color:#94a3b8;background:rgba(255,255,255,0.02);">5. API Design</div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box flow-yes">6. System Design (HLD)</div>
+    </div>
+
+</div>
+
+<style>
+@keyframes blink { 50% { opacity: 0; } }
+</style>
+
+</body>
+</html>
