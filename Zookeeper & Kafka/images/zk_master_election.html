@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0f1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  color: #e2e8f0;
+}
+
+.canvas {
+  width: 1400px;
+  height: 800px;
+  position: relative;
+  background: #0f1117;
+}
+
+/* ── Title ── */
+.title {
+  position: absolute;
+  top: 28px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 26px; font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+.title span { color: #818cf8; }
+
+/* ── Phase label ── */
+#phase-label {
+  position: absolute;
+  top: 70px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px; font-weight: 700;
+  padding: 5px 18px;
+  border-radius: 20px;
+  background: #1e1b4b;
+  color: #a5b4fc;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.4s;
+}
+
+/* ── Generic node box ── */
+.node {
+  position: absolute;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+  transition: all 0.5s ease;
+  border: 2px solid transparent;
+  padding: 10px 14px;
+}
+
+/* ── ZooKeeper panel ── */
+#zk {
+  width: 200px; height: 120px;
+  top: 320px; left: 600px;
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  border-color: #6366f1;
+  box-shadow: 0 0 30px rgba(99,102,241,0.25);
+}
+#zk .icon { font-size: 30px; }
+#zk .label { font-size: 13px; color: #a5b4fc; }
+#zk .zval {
+  font-size: 16px; font-weight: 800;
+  color: #f8fafc;
+  background: #1e1b4b;
+  border-radius: 8px;
+  padding: 3px 12px;
+  margin-top: 2px;
+  min-width: 60px;
+  text-align: center;
+  transition: all 0.4s;
+}
+
+/* ── DB nodes ── */
+.db-node {
+  width: 120px; height: 90px;
+  background: #111827;
+  border-color: #374151;
+  transition: all 0.5s ease;
+}
+.db-node .icon { font-size: 24px; }
+.db-node .db-label { font-size: 12px; color: #9ca3af; }
+.db-node .db-id { font-size: 18px; font-weight: 800; color: #f9fafb; }
+
+#db1 { top: 100px; left: 100px; }
+#db2 { top: 100px; left: 320px; }
+#db3 { top: 100px; left: 900px; }
+#db4 { top: 100px; left: 1120px; }
+#db5 { top: 580px; left: 320px; }
+#db6 { top: 580px; left: 900px; }
+
+/* ── App Server ── */
+#appserver {
+  width: 140px; height: 80px;
+  top: 360px; left: 80px;
+  background: #0c1a2e;
+  border-color: #1d4ed8;
+}
+#appserver .icon { font-size: 22px; }
+#appserver .label { font-size: 11px; color: #60a5fa; }
+
+/* ── Status badges ── */
+.badge {
+  position: absolute;
+  top: -12px; right: -12px;
+  font-size: 10px; font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transition: all 0.4s;
+}
+.badge.master { background: #16a34a; color: #fff; }
+.badge.slave  { background: #374151; color: #9ca3af; }
+.badge.dead   { background: #dc2626; color: #fff; }
+.badge.racing { background: #d97706; color: #fff; }
+.badge.winner { background: #7c3aed; color: #fff; }
+
+/* ── SVG lines ── */
+svg.lines {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1400px; height: 800px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.conn-line {
+  stroke: #374151;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-dasharray: 6 4;
+  opacity: 0.4;
+}
+.hb-line {
+  stroke: #6366f1;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  transition: opacity 0.3s;
+}
+.race-line {
+  stroke: #f59e0b;
+  stroke-width: 2.5;
+  fill: none;
+  opacity: 0;
+  stroke-dasharray: 8 4;
+}
+.notify-line {
+  stroke: #8b5cf6;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+}
+.write-line {
+  stroke: #22c55e;
+  stroke-width: 2.5;
+  fill: none;
+  opacity: 0;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+}
+
+/* ── Info panel ── */
+#info-panel {
+  position: absolute;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  background: #1e2030;
+  border: 1px solid #374151;
+  border-radius: 14px;
+  padding: 14px 32px;
+  font-size: 14px;
+  color: #94a3b8;
+  text-align: center;
+  min-width: 560px;
+  transition: all 0.4s;
+}
+#info-panel b { color: #e2e8f0; }
+#info-panel .highlight-text { color: #818cf8; font-weight: 700; }
+
+/* ── Timeline dots ── */
+.timeline {
+  position: absolute;
+  bottom: 88px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 10px; align-items: center;
+}
+.tdot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #374151;
+  transition: all 0.4s;
+}
+.tdot.active { background: #818cf8; transform: scale(1.4); }
+.tdot.done   { background: #4ade80; }
+
+/* ── ZK /master value flash ── */
+@keyframes flashGreen { 0%,100% { background: #1e1b4b; } 50% { background: #14532d; } }
+@keyframes flashRed   { 0%,100% { background: #1e1b4b; } 50% { background: #7f1d1d; } }
+@keyframes flashPurple{ 0%,100% { background: #1e1b4b; } 50% { background: #4c1d95; } }
+
+.flash-green  { animation: flashGreen 0.6s ease; }
+.flash-red    { animation: flashRed   0.6s ease; }
+.flash-purple { animation: flashPurple 0.6s ease; }
+
+/* heartbeat pulse on ZK */
+@keyframes zkPulse { 0%,100% { box-shadow: 0 0 30px rgba(99,102,241,0.25); } 50% { box-shadow: 0 0 55px rgba(99,102,241,0.6); } }
+.zk-pulse { animation: zkPulse 1s ease infinite; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="title">Zookeeper <span>Master Election</span> — Step-by-Step Animation</div>
+  <div id="phase-label">Phase 1 — Normal Operation</div>
+
+  <!-- Timeline dots -->
+  <div class="timeline">
+    <div class="tdot active" id="td0"></div>
+    <div class="tdot" id="td1"></div>
+    <div class="tdot" id="td2"></div>
+    <div class="tdot" id="td3"></div>
+    <div class="tdot" id="td4"></div>
+  </div>
+
+  <!-- SVG lines layer -->
+  <svg class="lines" id="svg-lines">
+    <!-- static dashed connections (db → zk) drawn by JS -->
+    <!-- dynamic animated lines added at runtime -->
+  </svg>
+
+  <!-- ZOOKEEPER node -->
+  <div class="node" id="zk">
+    <div class="icon">🦁</div>
+    <div class="label">Zookeeper</div>
+    <div class="label" style="font-size:11px; color:#6366f1;">/master =</div>
+    <div class="zval" id="zk-val">DB-1</div>
+  </div>
+
+  <!-- DB Nodes -->
+  <div class="node db-node" id="db1">
+    <div class="badge master" id="b1">MASTER</div>
+    <div class="icon">🗄️</div>
+    <div class="db-id">DB-1</div>
+    <div class="db-label">Master</div>
+  </div>
+  <div class="node db-node" id="db2">
+    <div class="badge slave" id="b2">SLAVE</div>
+    <div class="icon">🗄️</div>
+    <div class="db-id">DB-2</div>
+    <div class="db-label">Slave</div>
+  </div>
+  <div class="node db-node" id="db3">
+    <div class="badge slave" id="b3">SLAVE</div>
+    <div class="icon">🗄️</div>
+    <div class="db-id">DB-3</div>
+    <div class="db-label">Slave</div>
+  </div>
+  <div class="node db-node" id="db4">
+    <div class="badge slave" id="b4">SLAVE</div>
+    <div class="icon">🗄️</div>
+    <div class="db-id">DB-4</div>
+    <div class="db-label">Slave</div>
+  </div>
+  <div class="node db-node" id="db5">
+    <div class="badge slave" id="b5">SLAVE</div>
+    <div class="icon">🗄️</div>
+    <div class="db-id">DB-5</div>
+    <div class="db-label">Slave</div>
+  </div>
+  <div class="node db-node" id="db6">
+    <div class="badge slave" id="b6">SLAVE</div>
+    <div class="icon">🗄️</div>
+    <div class="db-id">DB-6</div>
+    <div class="db-label">Slave</div>
+  </div>
+
+  <!-- App Server -->
+  <div class="node" id="appserver">
+    <div class="icon">⚙️</div>
+    <div class="label">App Server</div>
+    <div class="label" style="font-size:10px;color:#374151;" id="appstatus">Writes → DB-1</div>
+  </div>
+
+  <!-- Info panel -->
+  <div id="info-panel">
+    <b>Phase 1 — Normal Operation:</b> DB-1 is master. It writes its IP to Zookeeper's <span class="highlight-text">/master</span> node and sends heartbeats every 5s. App servers write directly to DB-1.
+  </div>
+
+</div>
+
+<script>
+// ──────────────────────────────────────────────────────────────────
+// Helper: get center of a DOM element relative to .canvas
+// ──────────────────────────────────────────────────────────────────
+function center(id) {
+  const el = document.getElementById(id);
+  return {
+    x: el.offsetLeft + el.offsetWidth / 2,
+    y: el.offsetTop  + el.offsetHeight / 2
+  };
+}
+
+// Build a line element in the SVG
+function makeLine(svg, x1,y1,x2,y2, cls, id) {
+  const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',x1); l.setAttribute('y1',y1);
+  l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+  l.setAttribute('class', cls);
+  if (id) l.setAttribute('id', id);
+  svg.appendChild(l);
+  return l;
+}
+
+function makePath(svg, d, cls, id) {
+  const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d', d);
+  p.setAttribute('class', cls);
+  if (id) p.setAttribute('id', id);
+  svg.appendChild(p);
+  return p;
+}
+
+// Animate a dashoffset line (draw effect)
+function drawLine(el, dur=600) {
+  el.style.opacity = '1';
+  el.style.transition = `stroke-dashoffset ${dur}ms ease`;
+  el.style.strokeDashoffset = '0';
+}
+function hideLine(el) {
+  el.style.opacity = '0';
+  el.style.strokeDashoffset = el.getAttribute('data-len') || '200';
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Build static background lines
+// ──────────────────────────────────────────────────────────────────
+const svg = document.getElementById('svg-lines');
+
+const nodes = ['db1','db2','db3','db4','db5','db6','appserver'];
+nodes.forEach(id => {
+  const a = center(id), b = center('zk');
+  makeLine(svg, a.x,a.y, b.x,b.y, 'conn-line');
+});
+
+// ──────────────────────────────────────────────────────────────────
+// Animation phases
+// ──────────────────────────────────────────────────────────────────
+const phases = [
+  { label: 'Phase 1 — Normal Operation',    dot: 0, dur: 4000 },  // normal
+  { label: 'Phase 2 — Master DB-1 Crashes', dot: 1, dur: 3500 },  // crash
+  { label: 'Phase 3 — ZK Detects Failure',  dot: 2, dur: 3500 },  // null
+  { label: 'Phase 4 — Slaves Race to Lead', dot: 3, dur: 4000 },  // race
+  { label: 'Phase 5 — New Master Elected',  dot: 4, dur: 4000 },  // elected
+];
+
+const infos = [
+  '<b>Normal Operation:</b> DB-1 is master. Heartbeat sent to Zookeeper every <span class="highlight-text">5 seconds</span>. App Server writes directly to DB-1. All slaves subscribe to <span class="highlight-text">/master</span>.',
+  '<b>Master Crashes!</b> DB-1 goes offline. No more heartbeats reach Zookeeper. App Server detects broken ZK connection → <span class="highlight-text">all writes stopped immediately</span>.',
+  '<b>ZK Detects Timeout:</b> No heartbeat within 5s. Zookeeper sets <span class="highlight-text">/master = null</span> and pushes notification to ALL subscribers instantly.',
+  '<b>Slaves Race:</b> DB-2, DB-3, DB-4, DB-5, DB-6 all try to write their IP to <span class="highlight-text">/master</span>. Zookeeper uses a lock — only <span class="highlight-text">one write succeeds</span>.',
+  '<b>New Master Elected:</b> DB-3 wins the race. <span class="highlight-text">/master = DB-3</span>. ZK notifies all. App Server resumes writes to DB-3. DB-3 sends heartbeats.',
+];
+
+let currentPhase = -1;
+
+// Lines we'll create dynamically
+let hbLine = null, notifyLines = [], raceLines = [], writeLine = null;
+
+function setPhase(idx) {
+  currentPhase = idx;
+
+  // Update dots
+  for (let i = 0; i < 5; i++) {
+    const d = document.getElementById('td'+i);
+    d.className = 'tdot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  }
+
+  // Phase label + info
+  document.getElementById('phase-label').textContent = phases[idx].label;
+  document.getElementById('info-panel').innerHTML = infos[idx];
+
+  // Clear dynamic lines
+  [hbLine, writeLine, ...notifyLines, ...raceLines].forEach(l => { if(l) l.remove(); });
+  hbLine = null; writeLine = null; notifyLines = []; raceLines = [];
+
+  if (idx === 0) phaseNormal();
+  else if (idx === 1) phaseCrash();
+  else if (idx === 2) phaseNull();
+  else if (idx === 3) phaseRace();
+  else if (idx === 4) phaseElected();
+}
+
+// ── Phase 0: Normal — heartbeat from DB-1 → ZK, app writes to DB-1
+function phaseNormal() {
+  // Reset all nodes
+  resetNodes();
+  markMaster('db1'); markSlaves(['db2','db3','db4','db5','db6']);
+  document.getElementById('zk-val').textContent = 'DB-1';
+  document.getElementById('appstatus').textContent = 'Writes → DB-1';
+  document.getElementById('zk').classList.add('zk-pulse');
+
+  // Animate heartbeat line DB-1 → ZK looping
+  const a = center('db1'), b = center('zk');
+  hbLine = makePath(svg, `M${a.x},${a.y} L${b.x},${b.y}`, 'hb-line', 'hb-main');
+  hbLine.setAttribute('data-len','200');
+  animateHb();
+}
+
+function animateHb() {
+  if (!hbLine) return;
+  hbLine.style.strokeDashoffset = '200';
+  hbLine.style.opacity = '1';
+  hbLine.style.transition = 'stroke-dashoffset 0.8s ease';
+  hbLine.style.strokeDashoffset = '0';
+  setTimeout(() => { if(hbLine) { hbLine.style.opacity='0'; setTimeout(animateHb, 600); } }, 900);
+}
+
+// ── Phase 1: Crash
+function phaseCrash() {
+  resetNodes();
+  markDead('db1'); markSlaves(['db2','db3','db4','db5','db6']);
+  document.getElementById('zk-val').textContent = 'DB-1';
+  document.getElementById('appstatus').textContent = '⛔ Writes STOPPED';
+  document.getElementById('appserver').style.borderColor = '#dc2626';
+  document.getElementById('zk').classList.remove('zk-pulse');
+}
+
+// ── Phase 2: ZK sets /master = null, notifies
+function phaseNull() {
+  resetNodes();
+  markDead('db1'); markSlaves(['db2','db3','db4','db5','db6']);
+
+  // Flash red on ZK value
+  const v = document.getElementById('zk-val');
+  v.textContent = 'null';
+  v.style.color = '#f87171';
+  v.classList.add('flash-red');
+  setTimeout(() => v.classList.remove('flash-red'), 700);
+
+  document.getElementById('appstatus').textContent = '⛔ Writes STOPPED';
+  document.getElementById('appserver').style.borderColor = '#dc2626';
+
+  // Draw notify lines from ZK → each slave
+  ['db2','db3','db4','db5','db6','appserver'].forEach((id, i) => {
+    const a = center('zk'), b = center(id);
+    const l = makePath(svg, `M${a.x},${a.y} L${b.x},${b.y}`, 'notify-line');
+    l.setAttribute('data-len','200');
+    notifyLines.push(l);
+    setTimeout(() => { l.style.opacity='1'; l.style.transition='stroke-dashoffset 0.7s ease'; l.style.strokeDashoffset='0'; }, i * 120);
+  });
+}
+
+// ── Phase 3: Slaves race
+function phaseRace() {
+  resetNodes();
+  markDead('db1');
+  ['db2','db3','db4','db5','db6'].forEach(id => markRacing(id));
+  document.getElementById('zk-val').textContent = 'null';
+  document.getElementById('zk-val').style.color = '#f59e0b';
+  document.getElementById('appstatus').textContent = '⛔ Writes STOPPED';
+  document.getElementById('appserver').style.borderColor = '#dc2626';
+
+  // Race arrows from slaves → ZK
+  ['db2','db3','db4','db5','db6'].forEach((id, i) => {
+    const a = center(id), b = center('zk');
+    const l = makePath(svg, `M${a.x},${a.y} L${b.x},${b.y}`, 'race-line');
+    raceLines.push(l);
+    setTimeout(() => { l.style.opacity = '1'; }, 200 + i * 180);
+  });
+}
+
+// ── Phase 4: DB-3 wins
+function phaseElected() {
+  resetNodes();
+  markDead('db1'); markMaster('db3'); markSlaves(['db2','db4','db5','db6']);
+
+  const v = document.getElementById('zk-val');
+  v.textContent = 'DB-3'; v.style.color = '#a78bfa';
+  v.classList.add('flash-purple');
+  setTimeout(() => v.classList.remove('flash-purple'), 700);
+
+  document.getElementById('appstatus').textContent = 'Writes → DB-3';
+  document.getElementById('appserver').style.borderColor = '#1d4ed8';
+  document.getElementById('zk').classList.add('zk-pulse');
+
+  // Heartbeat line DB-3 → ZK
+  const a = center('db3'), b = center('zk');
+  hbLine = makePath(svg, `M${a.x},${a.y} L${b.x},${b.y}`, 'hb-line');
+  hbLine.setAttribute('data-len','200');
+  animateHb();
+
+  // Write line app → DB-3
+  setTimeout(() => {
+    const a2 = center('appserver'), b2 = center('db3');
+    writeLine = makePath(svg, `M${a2.x},${a2.y} L${b2.x},${b2.y}`, 'write-line');
+    writeLine.setAttribute('data-len','300');
+    writeLine.style.opacity = '1';
+    writeLine.style.transition = 'stroke-dashoffset 0.8s ease';
+    writeLine.style.strokeDashoffset = '0';
+  }, 800);
+}
+
+// ── Helpers ──
+function resetNodes() {
+  document.getElementById('zk').classList.remove('zk-pulse');
+  document.getElementById('zk-val').style.color = '#f8fafc';
+  ['db1','db2','db3','db4','db5','db6'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.borderColor = '#374151';
+    el.style.background = '#111827';
+    el.style.opacity = '1';
+    ['b1','b2','b3','b4','b5','b6'].forEach(b => {
+      const badge = document.getElementById(b);
+      if (badge) badge.style.opacity = '0';
+    });
+    const lbl = el.querySelector('.db-label');
+    if (lbl) lbl.style.color = '#9ca3af';
+  });
+  document.getElementById('appserver').style.borderColor = '#1d4ed8';
+}
+
+function markMaster(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = '#16a34a';
+  el.style.background = 'linear-gradient(135deg,#052e16,#14532d)';
+  el.querySelector('.db-label').textContent = 'Master';
+  const n = id.replace('db','');
+  const b = document.getElementById('b'+n);
+  if (b) { b.className='badge master'; b.style.opacity='1'; }
+}
+
+function markSlaves(ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    el.style.borderColor = '#374151';
+    el.querySelector('.db-label').textContent = 'Slave';
+    const n = id.replace('db','');
+    const b = document.getElementById('b'+n);
+    if (b) { b.className='badge slave'; b.style.opacity='0.7'; }
+  });
+}
+
+function markDead(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = '#dc2626';
+  el.style.background = 'linear-gradient(135deg,#1c0a0a,#450a0a)';
+  el.style.opacity = '0.55';
+  el.querySelector('.db-label').textContent = 'DEAD';
+  const n = id.replace('db','');
+  const b = document.getElementById('b'+n);
+  if (b) { b.className='badge dead'; b.style.opacity='1'; }
+}
+
+function markRacing(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = '#d97706';
+  el.style.background = 'linear-gradient(135deg,#1c1400,#451e00)';
+  el.querySelector('.db-label').textContent = 'Racing...';
+  const n = id.replace('db','');
+  const b = document.getElementById('b'+n);
+  if (b) { b.className='badge racing'; b.style.opacity='1'; }
+}
+
+// ── Auto-advance loop ──
+function runPhases() {
+  let idx = 0;
+  setPhase(idx);
+  function next() {
+    const dur = phases[idx].dur;
+    setTimeout(() => {
+      idx = (idx + 1) % phases.length;
+      setPhase(idx);
+      next();
+    }, dur);
+  }
+  next();
+}
+
+// Start after fonts load
+setTimeout(runPhases, 800);
+</script>
+</body>
+</html>

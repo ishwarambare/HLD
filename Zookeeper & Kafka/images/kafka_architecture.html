@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0a0e1a;
+  display: flex; align-items: center; justify-content: center;
+  height: 100vh; overflow: hidden; color: #e2e8f0;
+}
+
+.canvas {
+  width: 1400px; height: 800px;
+  position: relative;
+  background: #0a0e1a;
+}
+
+/* ─── Title ─── */
+.title {
+  position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+  font-size: 28px; font-weight: 800; color: #f1f5f9; white-space: nowrap; letter-spacing: -0.5px;
+}
+.title span { color: #f59e0b; }
+.sub {
+  position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+  font-size: 13px; color: #64748b; white-space: nowrap; letter-spacing: 0.5px;
+}
+
+/* ─── Section labels ─── */
+.section-label {
+  position: absolute;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 20px; color: #64748b;
+  border: 1px solid #1e293b;
+}
+
+/* ─── Divider lines ─── */
+svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-events:none; z-index:0; }
+
+/* ─── Generic card ─── */
+.card {
+  position: absolute;
+  border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; border: 2px solid #1e293b;
+  transition: all 0.3s;
+}
+.card:hover { transform: scale(1.03); }
+.card .icon { font-size: 26px; }
+.card .name { font-size: 12px; font-weight: 700; color: #f1f5f9; }
+.card .sub-label { font-size: 10px; color: #64748b; }
+
+/* ─── Producers ─── */
+.producer {
+  width: 115px; height: 80px;
+  background: linear-gradient(135deg, #0c1322, #0f2545);
+  border-color: #1d4ed8;
+}
+
+/* ─── Kafka box ─── */
+#kafka-box {
+  position: absolute;
+  top: 120px; left: 480px;
+  width: 440px; height: 560px;
+  border-radius: 20px;
+  background: rgba(245,158,11,0.04);
+  border: 2px solid rgba(245,158,11,0.25);
+}
+#kafka-title {
+  position: absolute;
+  top: -14px; left: 50%; transform: translateX(-50%);
+  background: #f59e0b;
+  color: #000; font-size: 12px; font-weight: 800;
+  padding: 3px 18px; border-radius: 12px; letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* ─── Topics inside Kafka ─── */
+.topic-block {
+  position: absolute;
+  border-radius: 12px;
+  padding: 10px 14px;
+  left: 22px; right: 22px;
+  background: #0f1424;
+  border: 1px solid #1e2a45;
+}
+.topic-name {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.partitions {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.part {
+  background: #1e293b; border-radius: 6px;
+  padding: 3px 8px; font-size: 10px; font-weight: 700; color: #94a3b8;
+  display: flex; align-items: center; gap: 4px;
+}
+.part .offset { color: #475569; font-size: 9px; }
+
+/* topic colours */
+.t-orange { border-color: #f59e0b44; }
+.t-orange .topic-name { color: #f59e0b; }
+.t-blue   { border-color: #3b82f644; }
+.t-blue .topic-name   { color: #60a5fa; }
+.t-green  { border-color: #22c55e44; }
+.t-green .topic-name  { color: #4ade80; }
+.t-purple { border-color: #a855f744; }
+.t-purple .topic-name { color: #c084fc; }
+
+/* ─── Consumers ─── */
+.consumer {
+  width: 115px; height: 72px;
+  background: linear-gradient(135deg, #0a1a12, #0f3020);
+  border-color: #16a34a;
+}
+
+/* ─── ZK small box ─── */
+#zk-mini {
+  position: absolute;
+  width: 130px; height: 80px;
+  top: 620px; left: 42px;
+  background: linear-gradient(135deg,#1e1b4b,#312e81);
+  border: 2px solid #6366f1;
+  border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap:4px;
+}
+#zk-mini .icon { font-size: 22px; }
+#zk-mini .name { font-size: 11px; font-weight: 700; color: #a5b4fc; }
+#zk-mini .sub-label { font-size: 9px; color: #6366f1; }
+
+/* ─── Brokers ─── */
+.broker {
+  position: absolute;
+  width: 95px; height: 64px;
+  border-radius: 12px;
+  background: #0f1a1f;
+  border: 2px solid #0e7490;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+}
+.broker .icon { font-size: 18px; }
+.broker .name { font-size: 10px; font-weight: 700; color: #67e8f9; }
+
+/* ─── Legend ─── */
+.legend {
+  position: absolute; bottom: 22px; right: 30px;
+  display: flex; gap: 18px; align-items: center;
+}
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* ─── Animated arrows ─── */
+@keyframes flowRight { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+@keyframes flowLeft  { from { stroke-dashoffset: 0;  } to { stroke-dashoffset: 24; } }
+.flow-arrow {
+  stroke-dasharray: 8 4;
+  animation: flowRight 0.6s linear infinite;
+}
+.flow-arrow.reverse { animation: flowLeft 0.6s linear infinite; }
+
+/* ─── Pulse rings ─── */
+@keyframes ring { 0%,100% { r:0; opacity:0.8; } 100% { r:20; opacity:0; } }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <!-- Titles -->
+  <div class="title">Apache <span>Kafka</span> — Architecture Overview</div>
+  <div class="sub">Topics · Partitions · Consumer Groups · Brokers · Replication</div>
+
+  <!-- Section labels -->
+  <div class="section-label" style="top:96px; left:36px;">PRODUCERS</div>
+  <div class="section-label" style="top:96px; left:490px; color:#f59e0b; border-color:#f59e0b44;">KAFKA CLUSTER</div>
+  <div class="section-label" style="top:96px; right:30px;">CONSUMERS</div>
+
+  <!-- SVG layer -->
+  <svg class="bg" id="svg">
+    <!-- vertical dividers -->
+    <line x1="440" y1="90" x2="440" y2="760" stroke="#1e293b" stroke-width="1" stroke-dasharray="6 5"/>
+    <line x1="960" y1="90" x2="960" y2="760" stroke="#1e293b" stroke-width="1" stroke-dasharray="6 5"/>
+
+    <!-- Producer → Kafka arrows (drawn by JS) -->
+    <!-- Consumer → (from Kafka) arrows (drawn by JS) -->
+  </svg>
+
+  <!-- ─── PRODUCERS ─── -->
+  <div class="card producer" style="top:140px; left:50px;">
+    <div class="icon">🛒</div>
+    <div class="name">Purchase</div>
+    <div class="sub-label">Service</div>
+  </div>
+  <div class="card producer" style="top:260px; left:50px;">
+    <div class="icon">💬</div>
+    <div class="name">Message</div>
+    <div class="sub-label">Service</div>
+  </div>
+  <div class="card producer" style="top:380px; left:50px;">
+    <div class="icon">🚗</div>
+    <div class="name">Location</div>
+    <div class="sub-label">Service (Uber)</div>
+  </div>
+  <div class="card producer" style="top:500px; left:50px;">
+    <div class="icon">📦</div>
+    <div class="name">Order</div>
+    <div class="sub-label">Service</div>
+  </div>
+
+  <!-- ─── KAFKA BOX ─── -->
+  <div id="kafka-box">
+    <div id="kafka-title">⚡ KAFKA CLUSTER</div>
+
+    <!-- Topic 1 -->
+    <div class="topic-block t-orange" style="top:30px;">
+      <div class="topic-name">📬 notify-warehouse</div>
+      <div class="partitions">
+        <div class="part">P0 <span class="offset">#0→842</span></div>
+        <div class="part">P1 <span class="offset">#0→791</span></div>
+        <div class="part">P2 <span class="offset">#0→803</span></div>
+      </div>
+    </div>
+
+    <!-- Topic 2 -->
+    <div class="topic-block t-blue" style="top:140px;">
+      <div class="topic-name">📧 send-email</div>
+      <div class="partitions">
+        <div class="part">P0 <span class="offset">#0→1.2M</span></div>
+        <div class="part">P1 <span class="offset">#0→1.1M</span></div>
+        <div class="part">P2 <span class="offset">#0→1.3M</span></div>
+        <div class="part">P3 <span class="offset">#0→1.0M</span></div>
+      </div>
+    </div>
+
+    <!-- Topic 3 -->
+    <div class="topic-block t-green" style="top:270px;">
+      <div class="topic-name">📊 analytics</div>
+      <div class="partitions">
+        <div class="part">P0</div>
+        <div class="part">P1</div>
+        <div class="part">P2</div>
+      </div>
+      <div style="font-size:10px; color:#4ade80; margin-top:6px;">Key: driver_id → hash(key) % partitions</div>
+    </div>
+
+    <!-- Topic 4 -->
+    <div class="topic-block t-purple" style="top:380px;">
+      <div class="topic-name">🔔 notifications</div>
+      <div class="partitions">
+        <div class="part">P0</div>
+        <div class="part">P1</div>
+      </div>
+    </div>
+
+    <!-- Retention badge -->
+    <div style="position:absolute; bottom:16px; left:50%;transform:translateX(-50%);
+      background:#1e2030; border:1px solid #374151; border-radius:10px; padding:6px 18px;
+      font-size:10px; color:#64748b; white-space:nowrap;">
+      ⏰ Default Retention: <b style="color:#e2e8f0;">1 Week</b> &nbsp;|&nbsp; Data persisted on <b style="color:#e2e8f0;">disk</b> &nbsp;|&nbsp; Replicated across <b style="color:#e2e8f0;">brokers</b>
+    </div>
+  </div>
+
+  <!-- ─── BROKERS (below Kafka box, shown as footnote) ─── -->
+  <div class="broker" style="top:710px; left:490px;">
+    <div class="icon">🖥️</div>
+    <div class="name">Broker 1</div>
+  </div>
+  <div class="broker" style="top:710px; left:600px;">
+    <div class="icon">🖥️</div>
+    <div class="name">Broker 2</div>
+  </div>
+  <div class="broker" style="top:710px; left:710px;">
+    <div class="icon">🖥️</div>
+    <div class="name">Broker 3</div>
+  </div>
+  <div style="position:absolute; top:722px; left:815px; font-size:10px; color:#0e7490;">
+    ↑ Partitions distributed + replicated across all brokers
+  </div>
+
+  <!-- ─── ZK mini (used by Kafka internally) ─── -->
+  <div id="zk-mini">
+    <div class="icon">🦁</div>
+    <div class="name">ZooKeeper</div>
+    <div class="sub-label">manages partition leaders</div>
+  </div>
+  <div id="zk-text" style="position:absolute; top:710px; left:42px; font-size:9px; color:#a5b4fc; width:130px; text-align:center;">
+    Used internally by Kafka
+  </div>
+
+  <!-- ─── CONSUMERS ─── -->
+  <!-- Consumer Group A -->
+  <div style="position:absolute; top:118px; right:24px; font-size:10px; font-weight:700; color:#f59e0b; letter-spacing:0.5px;">
+    Consumer Group: warehouse-group
+  </div>
+  <div class="card consumer" style="top:138px; right:30px;">
+    <div class="icon">🏭</div>
+    <div class="name">Warehouse</div>
+    <div class="sub-label">Consumer A1</div>
+  </div>
+  <div class="card consumer" style="top:230px; right:30px;">
+    <div class="icon">🏭</div>
+    <div class="name">Warehouse</div>
+    <div class="sub-label">Consumer A2</div>
+  </div>
+
+  <!-- Consumer Group B -->
+  <div style="position:absolute; top:322px; right:24px; font-size:10px; font-weight:700; color:#60a5fa; letter-spacing:0.5px;">
+    Consumer Group: email-group
+  </div>
+  <div class="card consumer" style="top:342px; right:30px; border-color:#1d4ed8; background:linear-gradient(135deg,#0c1322,#0f2545);">
+    <div class="icon">📧</div>
+    <div class="name">Email</div>
+    <div class="sub-label">Consumer B1</div>
+  </div>
+  <div class="card consumer" style="top:430px; right:30px; border-color:#1d4ed8; background:linear-gradient(135deg,#0c1322,#0f2545);">
+    <div class="icon">📧</div>
+    <div class="name">Email</div>
+    <div class="sub-label">Consumer B2</div>
+  </div>
+
+  <!-- Consumer Group C -->
+  <div style="position:absolute; top:522px; right:24px; font-size:10px; font-weight:700; color:#c084fc; letter-spacing:0.5px;">
+    Consumer Group: analytics-group
+  </div>
+  <div class="card consumer" style="top:542px; right:30px; border-color:#7c3aed; background:linear-gradient(135deg,#13091a,#220f40);">
+    <div class="icon">📊</div>
+    <div class="name">Analytics</div>
+    <div class="sub-label">Consumer C1 (Uber)</div>
+  </div>
+  <div class="card consumer" style="top:630px; right:30px; border-color:#7c3aed; background:linear-gradient(135deg,#13091a,#220f40);">
+    <div class="icon">📊</div>
+    <div class="name">Analytics</div>
+    <div class="sub-label">Consumer C2</div>
+  </div>
+
+  <!-- ─── Legend ─── -->
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#1d4ed8;"></div>Producers</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f59e0b;"></div>Kafka Topics</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#16a34a;"></div>Consumer Groups</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#0e7490;"></div>Brokers</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#6366f1;"></div>ZooKeeper</div>
+  </div>
+
+</div>
+
+<script>
+const svg = document.getElementById('svg');
+
+function arrow(svg, x1,y1,x2,y2, color, dashed=false) {
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  const d = `M${x1},${y1} C${x1+60},${y1} ${x2-60},${y2} ${x2},${y2}`;
+  path.setAttribute('d', d);
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width','2');
+  path.setAttribute('stroke-dasharray', dashed ? '8 4' : '6 3');
+  path.setAttribute('class','flow-arrow');
+  path.setAttribute('opacity','0.75');
+
+  const ah = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  ah.setAttribute('fill', color);
+  ah.setAttribute('opacity','0.85');
+
+  const angle = Math.atan2(y2-y1, x2-x1);
+  const tip = { x: x2, y: y2 };
+  const s = 7;
+  function rot(px,py,a) { return { x: px*Math.cos(a)-py*Math.sin(a), y: px*Math.sin(a)+py*Math.cos(a) }; }
+  const p1 = rot(-s,-s/2,angle), p2 = rot(-s,s/2,angle);
+  ah.setAttribute('points', `${tip.x},${tip.y} ${tip.x+p1.x},${tip.y+p1.y} ${tip.x+p2.x},${tip.y+p2.y}`);
+
+  g.appendChild(path);
+  g.appendChild(ah);
+  svg.appendChild(g);
+}
+
+function getEdge(el, edge) {
+  let x = el.offsetLeft;
+  let y = el.offsetTop;
+  let w = el.offsetWidth;
+  let h = el.offsetHeight;
+  let p = el.offsetParent;
+  while(p && p.classList && !p.classList.contains('canvas')) {
+    x += p.offsetLeft;
+    y += p.offsetTop;
+    p = p.offsetParent;
+  }
+  if (edge === 'right') return { x: x + w, y: y + h/2 };
+  if (edge === 'left') return { x: x, y: y + h/2 };
+  return { x: x + w/2, y: y + h/2 };
+}
+
+// ── Draw arrows after layout ──
+setTimeout(() => {
+  const producers = document.querySelectorAll('.producer');
+  const consumers = document.querySelectorAll('.consumer');
+
+  // Producer → Topic
+  const prodTargets = [
+    ['.t-orange',' .t-blue'],
+    ['.t-blue', '.t-purple'],
+    ['.t-green'],
+    ['.t-orange', '.t-blue']
+  ];
+
+  prodTargets.forEach((targets, i) => {
+    const start = getEdge(producers[i], 'right');
+    targets.forEach(sel => {
+      const topic = document.querySelector(sel.trim());
+      if (topic) {
+        const end = getEdge(topic, 'left');
+        arrow(svg, start.x + 4, start.y, end.x - 4, end.y, '#3b82f6');
+      }
+    });
+  });
+
+  // Topic → Consumer
+  const consTargets = [
+    { topic: '.t-orange', consumers: [0, 1] },
+    { topic: '.t-blue', consumers: [2, 3] },
+    { topic: '.t-green', consumers: [4, 5] },
+  ];
+
+  consTargets.forEach(mapping => {
+    const topic = document.querySelector(mapping.topic);
+    if (!topic) return;
+    const start = getEdge(topic, 'right');
+    mapping.consumers.forEach(idx => {
+      const cons = consumers[idx];
+      if (cons) {
+        const end = getEdge(cons, 'left');
+        arrow(svg, start.x + 4, start.y, end.x - 4, end.y, '#16a34a');
+      }
+    });
+  });
+
+  // ZK ↔ Kafka (internal)
+  const zk = document.getElementById('zk-mini');
+  const kafkaBox = document.getElementById('kafka-box');
+  const zStart = getEdge(zk, 'right');
+  const kEnd = getEdge(kafkaBox, 'left');
+  arrow(svg, zStart.x + 4, zStart.y, kEnd.x - 4, zStart.y, '#6366f1');
+
+}, 200);
+</script>
+</body>
+</html>
