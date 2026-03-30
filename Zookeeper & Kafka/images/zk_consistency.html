@@ -7,112 +7,110 @@
 * { box-sizing: border-box; margin:0; padding:0; }
 body {
   font-family: 'Inter', sans-serif;
-  background: #0a0e1a;
+  background: #f8fafc;
   display: flex; align-items: center; justify-content: center;
-  height: 100vh; overflow: hidden; color: #e2e8f0;
+  /* Allow scrolling if viewport is too small, rather than hiding & clipping */
+  min-height: 100vh; color: #1e293b; padding: 20px; overflow: auto;
 }
-.canvas { width: 1400px; height: 800px; position: relative; background: #0a0e1a; }
+.canvas { width: 1400px; height: 880px; position: relative; background: #f8fafc; flex-shrink: 0; }
 
 .title {
-  position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
-  font-size: 26px; font-weight: 800; color: #f1f5f9; white-space: nowrap;
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 26px; font-weight: 800; color: #0f172a; white-space: nowrap;
 }
-.title span { color: #818cf8; }
+.title span { color: #4f46e5; }
 
 /* ── Two-Phase Commit Timeline ── */
 .phase-col {
   position: absolute;
   top: 80px;
-  width: 650px; height: 660px;
+  width: 440px; height: 780px;
   border-radius: 20px;
   padding: 24px 28px;
 }
-.phase-col.left  { left: 30px;  background: rgba(30,27,75,0.35); border: 1px solid #312e81; }
-.phase-col.right { right: 30px; background: rgba(5,46,22,0.35);  border: 1px solid #14532d; }
+.phase-col.left  { left: 20px;  background: rgba(238, 242, 255, 0.6); border: 1px solid #c7d2fe; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+.phase-col.right { right: 20px; background: rgba(220, 252, 231, 0.4);  border: 1px solid #bbf7d0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
 
 .phase-title {
-  font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
-  margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
 }
-.ph1-col .phase-title { color: #818cf8; }
-.ph2-col .phase-title { color: #4ade80; }
+.ph1 .phase-title { color: #4338ca; }
+.ph2 .phase-title { color: #16a34a; }
 
 /* ── Step cards ── */
 .step {
-  display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start;
+  display: flex; gap: 14px; margin-bottom: 20px; align-items: flex-start;
 }
 .step-num {
-  width: 30px; height: 30px; border-radius: 50%;
+  width: 32px; height: 32px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 800; flex-shrink: 0;
 }
 .step-body { flex: 1; }
-.step-body .step-head { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
-.step-body .step-desc { font-size: 11px; color: #64748b; line-height: 1.5; }
+.step-body .step-head { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.step-body .step-desc { font-size: 12px; color: #475569; line-height: 1.5; }
 
 /* Colors phase 1 */
-.ph1 .step-num { background: #1e1b4b; color: #a5b4fc; border: 1px solid #4338ca; }
-.ph1 .step-head { color: #a5b4fc; }
+.ph1 .step-num { background: #e0e7ff; color: #4338ca; border: 1px solid #818cf8; }
+.ph1 .step-body .step-head { color: #1e1b4b; }
 
 /* Colors phase 2 */
-.ph2 .step-num { background: #052e16; color: #4ade80; border: 1px solid #16a34a; }
-.ph2 .step-head { color: #4ade80; }
+.ph2 .step-num { background: #dcfce7; color: #16a34a; border: 1px solid #4ade80; }
+.ph2 .step-body .step-head { color: #052e16; }
 
 /* ── Center cluster ── */
 .cluster-box {
   position: absolute;
-  top: 180px; left: 50%; transform: translateX(-50%);
+  top: 100px; left: 50%; transform: translateX(-50%);
   width: 200px;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
 .zk-node {
-  width: 160px; height: 58px;
+  width: 160px; height: 50px;
   border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  gap: 8px; font-size: 12px; font-weight: 700;
+  gap: 8px; font-size: 13px; font-weight: 700;
   border: 2px solid;
 }
-.zk-node.leader   { background: linear-gradient(135deg,#1e1b4b,#312e81); border-color: #818cf8; color: #c7d2fe; }
-.zk-node.follower { background: #0f1117; border-color: #374151; color: #94a3b8; }
+.zk-node.leader   { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-color: #818cf8; color: #312e81; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); }
+.zk-node.follower { background: #ffffff; border-color: #cbd5e1; color: #334155; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
 .zk-node .icon { font-size: 20px; }
 
 /* connector dots */
-.connector { width: 2px; height: 12px; background: #374151; margin: 0 auto; }
+.connector { width: 3px; height: 14px; background: #cbd5e1; margin: 0 auto; }
 
 /* ── Quorum box ── */
 .quorum-box {
   position: absolute;
-  top: 590px; left: 50%; transform: translateX(-50%);
-  width: 340px;
-  background: rgba(124,58,237,0.1); border: 1px solid #7c3aed44;
-  border-radius: 14px; padding: 14px 20px; text-align: center;
+  top: 720px; left: 50%; transform: translateX(-50%);
+  width: 380px;
+  background: rgba(243, 232, 255, 0.8); border: 1px solid #e9d5ff;
+  border-radius: 14px; padding: 16px 20px; text-align: center;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.1);
 }
-.quorum-box .q-title { font-size: 12px; font-weight: 800; color: #c084fc; margin-bottom: 8px; letter-spacing: 0.5px; }
-.quorum-box .q-formula { font-size: 22px; font-weight: 800; color: #f1f5f9; margin-bottom: 6px; font-family: monospace; }
-.quorum-box .q-desc { font-size: 10px; color: #64748b; }
+.quorum-box .q-title { font-size: 13px; font-weight: 800; color: #7e22ce; margin-bottom: 8px; letter-spacing: 0.5px; }
+.quorum-box .q-formula { font-size: 22px; font-weight: 800; color: #4c1d95; margin-bottom: 6px; font-family: monospace; }
+.quorum-box .q-desc { font-size: 11px; color: #6b7280; }
 
 /* ── CAP badge ── */
 .cap-badge {
-  position: absolute; top: 90px; left: 50%; transform: translateX(-50%);
-  background: #1e1b4b; border: 1px solid #4338ca; border-radius: 10px;
-  padding: 6px 20px; font-size: 13px; font-weight: 700; color: #818cf8;
-  white-space: nowrap;
+  position: absolute; top: 55px; left: 50%; transform: translateX(-50%);
+  background: #e0e7ff; border: 1px solid #a5b4fc; border-radius: 8px;
+  padding: 6px 20px; font-size: 13px; font-weight: 700; color: #4338ca;
+  white-space: nowrap; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
 }
-
-/* ── Arrows ── */
-svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-events:none; }
-@keyframes flow { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
-.animated-dash { stroke-dasharray: 8 4; animation: flow 0.5s linear infinite; }
 
 /* ── Status legend ── */
 .status-row {
   display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
 }
 .s-badge {
-  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 8px;
+  font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px;
 }
-.s-ok    { background: #052e16; color: #4ade80; }
-.s-pend  { background: #1c1400; color: #f59e0b; }
-.s-fail  { background: #1c0a0a; color: #f87171; }
+.s-ok    { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+.s-pend  { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+.s-fail  { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.s-gray  { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 </style>
 </head>
 <body>
@@ -122,9 +120,6 @@ svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-e
 
   <div class="cap-badge">⚖️ CAP Theorem: Zookeeper is CP — Consistency + Partition Tolerance</div>
 
-  <!-- SVG layer -->
-  <svg class="bg" id="svg"></svg>
-
   <!-- ── LEFT PANEL: Phase 1 ── -->
   <div class="phase-col left ph1">
     <div class="phase-title">📝 Phase 1 — Prepare (Write Request)</div>
@@ -133,7 +128,7 @@ svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-e
       <div class="step-num">1</div>
       <div class="step-body">
         <div class="step-head">Write arrives at ZK Leader</div>
-        <div class="step-desc">A slave DB writes its IP to <code style="color:#818cf8">/master</code>. This always goes to the ZK Leader.</div>
+        <div class="step-desc">A slave DB writes its IP to <code style="color:#4f46e5; font-weight:600;">/master</code>. This always goes to the ZK Leader.</div>
       </div>
     </div>
 
@@ -141,10 +136,10 @@ svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-e
       <div class="step-num">2</div>
       <div class="step-body">
         <div class="step-head">Leader writes locally (NON-COMMITTED)</div>
-        <div class="step-desc">Data is persisted to disk. Status = <b style="color:#f59e0b">PENDING</b>. The data exists but is not yet official.</div>
+        <div class="step-desc">Data is persisted to disk. Status = <b style="color:#d97706">PENDING</b>. The data exists but is not yet official.</div>
         <div class="status-row">
           <span class="s-badge s-pend">PENDING</span>
-          <span class="s-badge" style="background:#1e293b; color:#64748b;">data on disk ✓</span>
+          <span class="s-badge s-gray">data on disk ✓</span>
         </div>
       </div>
     </div>
@@ -174,7 +169,7 @@ svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-e
       <div class="step-num">5</div>
       <div class="step-body">
         <div class="step-head">Check majority</div>
-        <div class="step-desc">If ACKs from <b style="color:#818cf8">&gt; half</b> of all machines (n+1 of 2n+1) → proceed to Phase 2. Otherwise → ROLLBACK.</div>
+        <div class="step-desc">If ACKs from <b style="color:#4f46e5; font-weight:800;">&gt; half</b> of all machines (n+1 of 2n+1) → proceed to Phase 2. Otherwise → ROLLBACK.</div>
         <div class="status-row">
           <span class="s-badge s-ok">4 of 7 ✓ → PROCEED</span>
           <span class="s-badge s-fail">2 of 7 ✗ → ROLLBACK</span>
@@ -197,11 +192,11 @@ svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-e
     <div class="connector"></div>
     <div class="zk-node follower"><span class="icon">🟩</span> Follower F4</div>
     <div class="connector"></div>
-    <div class="zk-node follower" style="opacity:0.4; border-style:dashed;">
+    <div class="zk-node follower" style="opacity:0.5; border-style:dashed;">
       <span class="icon">❌</span> Follower F5
     </div>
     <div class="connector"></div>
-    <div class="zk-node follower" style="opacity:0.4; border-style:dashed;">
+    <div class="zk-node follower" style="opacity:0.5; border-style:dashed;">
       <span class="icon">❌</span> Follower F6
     </div>
   </div>
@@ -221,7 +216,7 @@ svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-e
       <div class="step-num">6</div>
       <div class="step-body">
         <div class="step-head">Leader commits (majority reached)</div>
-        <div class="step-desc">Leader changes its own data status from PENDING → <b style="color:#4ade80">COMMITTED</b>.</div>
+        <div class="step-desc">Leader changes its own data status from PENDING → <b style="color:#16a34a">COMMITTED</b>.</div>
         <div class="status-row"><span class="s-badge s-ok">COMMITTED ✓</span></div>
       </div>
     </div>
@@ -242,30 +237,30 @@ svg.bg { position:absolute; top:0; left:0; width:1400px; height:800px; pointer-e
       <div class="step-num">8</div>
       <div class="step-body">
         <div class="step-head">Success response to DB slave</div>
-        <div class="step-desc">Slave DB that initiated the write now knows it is the <b style="color:#4ade80">new master</b>. ZK notifies all subscribers.</div>
+        <div class="step-desc">Slave DB that initiated the write now knows it is the <b style="color:#16a34a">new master</b>. ZK notifies all subscribers.</div>
         <div class="status-row"><span class="s-badge s-ok">/master = DB-4 ✓</span></div>
       </div>
     </div>
 
-    <div style="height:1px; background:#14532d; margin: 14px 0;"></div>
-    <div class="phase-title" style="color:#f87171; margin-bottom: 14px;">❌ Rollback Path</div>
+    <div style="height:1px; background:#bbf7d0; margin: 20px 0;"></div>
+    <div class="phase-title" style="color:#dc2626; margin-bottom: 20px;">❌ Rollback Path</div>
 
     <div class="step">
-      <div class="step-num" style="background:#1c0a0a; border-color:#991b1b; color:#f87171;">R</div>
+      <div class="step-num" style="background:#fee2e2; border-color:#fca5a5; color:#dc2626;">R</div>
       <div class="step-body">
-        <div class="step-head" style="color:#f87171;">Majority NOT reached → Rollback</div>
+        <div class="step-head" style="color:#dc2626;">Majority NOT reached → Rollback</div>
         <div class="step-desc">If fewer than n+1 ACKs received: Leader discards the PENDING data. Followers told to rollback too. The next competing slave's write gets a chance.</div>
         <div class="status-row">
           <span class="s-badge s-fail">ROLLBACK</span>
-          <span class="s-badge" style="background:#1e293b;color:#64748b;">next slave attempts →</span>
+          <span class="s-badge s-gray">next slave attempts →</span>
         </div>
       </div>
     </div>
 
-    <div style="height:1px; background:#14532d; margin: 14px 0;"></div>
+    <div style="height:1px; background:#bbf7d0; margin: 20px 0;"></div>
 
-    <div style="font-size:10px; color:#4ade80; margin-top:4px; line-height: 1.7;">
-      💡 <b style="color:#f1f5f9;">Strong Consistency guarantee:</b> A committed write is guaranteed to be<br>
+    <div style="font-size:12px; color:#16a34a; margin-top:10px; line-height: 1.7;">
+      💡 <b style="color:#0f172a;">Strong Consistency guarantee:</b> A committed write is guaranteed to be<br>
       on at least n+1 machines. Any subsequent read from a majority will<br>
       always see this write. No stale reads possible.
     </div>
